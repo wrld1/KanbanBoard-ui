@@ -1,4 +1,8 @@
-export const fetcher = async (url: string, method = "GET", data = null) => {
+export const fetcher = async (
+  url: string,
+  method = "GET",
+  data: Record<string, unknown> | null = null
+) => {
   try {
     const response = await fetch(url, {
       method,
