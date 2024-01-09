@@ -10,11 +10,14 @@ import { mutate } from "swr";
 import CustomTooltip from "../ui/CustomTooltip";
 import { Button } from "../ui/button";
 import { XCircle } from "lucide-react";
-import { deleteCard } from "@/api/Card.api";
-import { toast } from "../ui/use-toast";
-import { ToastAction } from "@radix-ui/react-toast";
+import { deleteCard, updateCard } from "@/api/Card.api";
 
 import { IBoardColumn } from "@/interfaces/IBoardColumn.interface";
+import { showErrorToast } from "@/lib/showErrorToast";
+import ModalWindow from "../ui/ModalWindow";
+import { FieldValues } from "react-hook-form";
+import { ICard } from "@/interfaces/ICard.interface";
+import { UpdateCardForm } from "../Forms/UpdateCardForm";
 
 type TaskCardProps = {
   title: string;
@@ -29,7 +32,7 @@ const TaskCard: FC<TaskCardProps> = ({
   description,
   columnId,
 }) => {
-  const handleDelete = () => {
+  const handleCardDelete = () => {
     deleteCard(cardId)
       .then(() => {
         mutate(
@@ -46,13 +49,32 @@ const TaskCard: FC<TaskCardProps> = ({
         );
       })
       .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: `There was a problem with your request: ${error.message}`,
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
+        showErrorToast(error);
       });
+  };
+
+  const handleCardUpdateSubmit = (cardId: string, data: FieldValues) => {
+    if (cardId) {
+      updateCard(cardId, data.title, data.description, columnId)
+        .then((updatedCard) => {
+          mutate(
+            `${import.meta.env.VITE_BASE_API_LINK}/boards`,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (cards: any) => {
+              if (!cards) {
+                return [];
+              }
+              return cards.map((card: ICard) =>
+                card.id === cardId ? updatedCard : card
+              );
+            },
+            false
+          );
+        })
+        .catch((error) => {
+          showErrorToast(error);
+        });
+    }
   };
 
   return (
@@ -63,13 +85,24 @@ const TaskCard: FC<TaskCardProps> = ({
           <CardDescription>{description}</CardDescription>
         </CardHeader>
 
-        <CardFooter>
+        <CardFooter className="flex justify-between">
+          {/* <CustomTooltip content="Edit board">
+            <ModalWindow actionType="update" tooltipContent="Update board">
+              <UpdateBoardForm id={id} onSubmit={handleCardUpdateSubmit} />
+            </ModalWindow>
+          </CustomTooltip> */}
+
+          <CustomTooltip content="Edit card">
+            <ModalWindow actionType="update" tooltipContent="Update card">
+              <UpdateCardForm id={cardId} onSubmit={handleCardUpdateSubmit} />
+            </ModalWindow>
+          </CustomTooltip>
           <CustomTooltip content="Delete card">
             <Button
               className="bg-red-400"
               variant="outline"
               size="icon"
-              onClick={handleDelete}
+              onClick={handleCardDelete}
             >
               <XCircle className="h-4 w-4" />
             </Button>

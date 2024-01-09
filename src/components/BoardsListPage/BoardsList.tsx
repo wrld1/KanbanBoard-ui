@@ -8,8 +8,7 @@ import { Skeleton } from "../ui/skeleton";
 import { CreateBoardForm } from "../Forms/CreateBoardForm";
 import { FieldValues } from "react-hook-form";
 import { createBoard } from "@/api/Board.api";
-import { toast } from "../ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { showErrorToast } from "@/lib/showErrorToast";
 
 const BoardsList: FC = () => {
   const { data: boards, error } = useSWR(
@@ -30,12 +29,7 @@ const BoardsList: FC = () => {
         );
       })
       .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: `There was a problem with your request: ${error.message}`,
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
+        showErrorToast(error);
       });
   };
 

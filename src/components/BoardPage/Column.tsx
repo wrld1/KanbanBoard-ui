@@ -14,9 +14,8 @@ import { CreateCardForm } from "../Forms/CreateCardForm";
 import { FieldValues } from "react-hook-form";
 import useSWR, { mutate } from "swr";
 import { createCard } from "@/api/Card.api";
-import { toast } from "../ui/use-toast";
-import { ToastAction } from "@radix-ui/react-toast";
 import { fetcher } from "@/lib/fetcher";
+import { showErrorToast } from "@/lib/showErrorToast";
 
 type ColumnProps = {
   columnId: string;
@@ -47,12 +46,7 @@ const Column: FC<ColumnProps> = ({ columnId }) => {
         );
       })
       .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: `There was a problem with your request: ${error.message}`,
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
+        showErrorToast(error);
       });
   };
 

@@ -26,7 +26,7 @@ export async function updateCard(
 ) {
   const updatedCard = await fetcher(
     `${import.meta.env.VITE_BASE_API_LINK}/cards/${id}`,
-    "PUT",
+    "PATCH",
     { title, description, columnId }
   );
 

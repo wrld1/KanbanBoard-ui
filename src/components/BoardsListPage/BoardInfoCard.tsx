@@ -9,17 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ToastAction } from "@/components/ui/toast";
 
 import { Button } from "@/components/ui/button";
 import { IBoard, IBoardResponseInterface } from "@/interfaces/IBoard.interface";
 import CustomTooltip from "../ui/CustomTooltip";
-import { toast } from "../ui/use-toast";
 import { deleteBoard, updateBoard } from "@/api/Board.api";
 import ModalWindow from "../ui/ModalWindow";
 import { FieldValues } from "react-hook-form";
 import { UpdateBoardForm } from "../Forms/UpdateBoardForm";
 import { useNavigate } from "react-router-dom";
+import { showErrorToast } from "@/lib/showErrorToast";
 
 type BoardInfoCardProps = IBoardResponseInterface &
   React.ComponentProps<typeof Card>;
@@ -27,22 +26,17 @@ type BoardInfoCardProps = IBoardResponseInterface &
 const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
   const navigate = useNavigate();
 
-  const handleDelete = () => {
+  const handleBoardDelete = () => {
     deleteBoard(id)
       .then(() => {
         mutate(`${import.meta.env.VITE_BASE_API_LINK}/boards`);
       })
       .catch((error) => {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: `There was a problem with your request: ${error.message}`,
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
+        showErrorToast(error);
       });
   };
 
-  const handleFormUpdatingSubmit = (id: string, data: FieldValues) => {
+  const handleBoardUpdateSubmit = (id: string, data: FieldValues) => {
     if (id && "name" in data) {
       updateBoard(id, data.name)
         .then((updatedBoard) => {
@@ -61,12 +55,7 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
           );
         })
         .catch((error) => {
-          toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: `There was a problem with your request: ${error.message}`,
-            action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
+          showErrorToast(error);
         });
     }
   };
@@ -88,7 +77,7 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
       <CardFooter className="flex gap-2">
         <CustomTooltip content="Edit board">
           <ModalWindow actionType="update" tooltipContent="Update board">
-            <UpdateBoardForm id={id} onSubmit={handleFormUpdatingSubmit} />
+            <UpdateBoardForm id={id} onSubmit={handleBoardUpdateSubmit} />
           </ModalWindow>
         </CustomTooltip>
         <CustomTooltip content="Delete board">
@@ -96,7 +85,7 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
             className="bg-red-400"
             variant="outline"
             size="icon"
-            onClick={handleDelete}
+            onClick={handleBoardDelete}
           >
             <XCircle className="h-4 w-4" />
           </Button>
