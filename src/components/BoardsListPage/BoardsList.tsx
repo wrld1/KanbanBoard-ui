@@ -5,7 +5,7 @@ import useSWR, { mutate } from "swr";
 import BoardInfoCard from "./BoardInfoCard";
 import ModalWindow from "../ui/ModalWindow";
 import { Skeleton } from "../ui/skeleton";
-import { BoardForm } from "../Forms/BoardForm";
+import { CreateBoardForm } from "../Forms/CreateBoardForm";
 import { FieldValues } from "react-hook-form";
 import { createBoard } from "@/api/Board.api";
 import { toast } from "../ui/use-toast";
@@ -40,21 +40,23 @@ const BoardsList: FC = () => {
   };
 
   return (
-    <div className="flex justify-between w-full">
-      <div className="flex flex-wrap gap-2">
-        {boards.map((board: IBoardResponseInterface) => (
-          <BoardInfoCard
-            key={board.id}
-            id={board.id}
-            name={board.name}
-            columns={board.columns}
-          />
-        ))}
-      </div>
+    <>
       <ModalWindow actionType="create" tooltipContent="Add board">
-        <BoardForm onSubmit={handleFormCreationSubmit} />
+        <CreateBoardForm onSubmit={handleFormCreationSubmit} />
       </ModalWindow>
-    </div>
+      <div className="flex justify-between w-full">
+        <div className="flex flex-wrap gap-2 w-full">
+          {boards.map((board: IBoardResponseInterface) => (
+            <BoardInfoCard
+              key={board.id}
+              id={board.id}
+              name={board.name}
+              columns={board.columns}
+            />
+          ))}
+        </div>
+      </div>
+    </>
   );
 };
 

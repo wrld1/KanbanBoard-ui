@@ -25,7 +25,7 @@ const createBoardSchema = z.object({
   }),
 });
 
-export function BoardForm({ onSubmit }: BoardFormProps) {
+export function CreateBoardForm({ onSubmit }: BoardFormProps) {
   const form = useForm({
     resolver: zodResolver(createBoardSchema),
     defaultValues: {

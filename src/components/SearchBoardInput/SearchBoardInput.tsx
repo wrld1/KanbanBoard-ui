@@ -15,12 +15,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import React, { FC } from "react";
 
 const FormSchema = z.object({
   boardId: z.string().uuid(),
 });
 
-function SearchBoardInput() {
+const SearchBoardInput: FC = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -71,6 +72,8 @@ function SearchBoardInput() {
       </form>
     </Form>
   );
-}
+};
 
-export default SearchBoardInput;
+const MemoizedSearchBoardInput = React.memo(SearchBoardInput);
+
+export default MemoizedSearchBoardInput;
