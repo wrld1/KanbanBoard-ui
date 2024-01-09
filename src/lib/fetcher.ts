@@ -13,7 +13,10 @@ export const fetcher = async (
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || `HTTP error! Status: ${response.status}`
+      );
     }
 
     const jsonData = await response.json();

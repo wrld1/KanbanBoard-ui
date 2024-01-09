@@ -1,11 +1,15 @@
-import { Toaster } from "react-hot-toast";
-import SearchBoardInput from "./components/SearchBoardInput";
+// import { Toaster } from "react-hot-toast";
+import { Toaster } from "@/components/ui/toaster";
+
 import { ThemeProvider } from "./components/theme-provider";
+import { RouterProvider } from "react-router-dom";
+import routerRoot from "./routes/root";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <Toaster
+      {/* <Toaster
         toastOptions={{
           success: {
             style: {
@@ -18,8 +22,14 @@ function App() {
             },
           },
         }}
+      /> */}
+      <Toaster />
+      <RouterProvider
+        router={routerRoot}
+        fallbackElement={
+          <Skeleton className="w-[100px] h-[20px] rounded-full" />
+        }
       />
-      <SearchBoardInput />
     </ThemeProvider>
   );
 }
