@@ -92,7 +92,12 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
           </ModalWindow>
         </CustomTooltip>
         <CustomTooltip content="Delete board">
-          <Button variant="outline" size="icon" onClick={handleDelete}>
+          <Button
+            className="bg-red-400"
+            variant="outline"
+            size="icon"
+            onClick={handleDelete}
+          >
             <XCircle className="h-4 w-4" />
           </Button>
         </CustomTooltip>

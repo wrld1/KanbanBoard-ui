@@ -1,2 +1,2 @@
-export * from "./BoardColumnsContainer";
-export { default } from "./BoardColumnsContainer";
+export * from "./ColumnsContainer";
+export { default } from "./ColumnsContainer";

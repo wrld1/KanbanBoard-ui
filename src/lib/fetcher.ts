@@ -13,14 +13,16 @@ export const fetcher = async (
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response
+        .text()
+        .then((text) => (text ? JSON.parse(text) : {}));
       throw new Error(
         errorData.message || `HTTP error! Status: ${response.status}`
       );
     }
 
-    const jsonData = await response.json();
-    return jsonData;
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
   } catch (error) {
     console.error("Error fetching data:", error);
     throw error;

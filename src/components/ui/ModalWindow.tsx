@@ -32,7 +32,12 @@ const ModalWindow = forwardRef<HTMLButtonElement, ModalWindowProps>(
       <Dialog>
         <CustomTooltip content={tooltipContent}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="icon" ref={ref}>
+            <Button
+              variant="outline"
+              size="icon"
+              ref={ref}
+              className="bg-green-300"
+            >
               {actionType === "create" ? (
                 <PlusSquare className="h-4 w-4" />
               ) : (

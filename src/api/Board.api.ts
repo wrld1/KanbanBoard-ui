@@ -15,34 +15,22 @@ export async function createBoard(name: string) {
 }
 
 export async function updateBoard(id: string, newName: string) {
-  const response = await fetch(
+  const updatedBoard = await fetcher(
     `${import.meta.env.VITE_BASE_API_LINK}/boards/${id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: newName }),
-    }
+    "PATCH",
+    { name: newName }
   );
 
-  if (!response.ok) {
+  if (!updatedBoard) {
     throw new Error("Failed to update board");
   }
 
-  const updatedBoard = await response.json();
   return updatedBoard;
 }
 
 export async function deleteBoard(id: string) {
-  const response = await fetch(
+  return await fetcher(
     `${import.meta.env.VITE_BASE_API_LINK}/boards/${id}`,
-    {
-      method: "DELETE",
-    }
+    "DELETE"
   );
-
-  if (!response.ok) {
-    throw new Error("Failed to delete board");
-  }
 }
