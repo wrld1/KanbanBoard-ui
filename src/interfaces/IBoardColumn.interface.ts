@@ -4,11 +4,12 @@ import { ICoreEntity } from "./ICoreEntity.interface";
 
 export interface IBoardColumn extends ICoreEntity {
   name: string;
+  order: number;
   board: IBoard;
   cards: ICard[];
 }
 
 export type IBoardColumnResponseInterface = Pick<
   IBoardColumn,
-  "id" | "name" | "board" | "cards"
+  "id" | "name" | "order" | "board" | "cards"
 >;

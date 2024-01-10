@@ -16,6 +16,7 @@ import useSWR, { mutate } from "swr";
 import { createCard } from "@/api/Card.api";
 import { fetcher } from "@/lib/fetcher";
 import { showErrorToast } from "@/lib/showErrorToast";
+import { Droppable } from "react-beautiful-dnd";
 
 type ColumnProps = {
   columnId: string;
@@ -34,7 +35,7 @@ const Column: FC<ColumnProps> = ({ columnId }) => {
   if (error) return <div>Failed to load</div>;
   if (isLoading) return null;
 
-  const { cards, name } = column;
+  const { cards, name, order } = column;
 
   const handleCardCreationSubmit = (data: FieldValues) => {
     createCard(data.title, columnId, data.description)
@@ -56,23 +57,42 @@ const Column: FC<ColumnProps> = ({ columnId }) => {
         <CardTitle>{name}</CardTitle>
         <CardDescription>Card Description</CardDescription>
       </CardHeader>
-      <CardContent>
-        {cards.map((card: ICard) => (
-          <TaskCard
-            cardId={card.id}
-            title={card.title}
-            description={card.description}
-            columnId={columnId}
-          />
-        ))}
+      <CardContent className="flex flex-col gap-2">
+        <Droppable key={columnId} droppableId={columnId}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              style={{
+                backgroundColor: snapshot.isDraggingOver
+                  ? "lightgrey"
+                  : "white",
+              }}
+            >
+              {cards.map((card: ICard, index: number) => (
+                <TaskCard
+                  cardId={card.id}
+                  key={card.id}
+                  title={card.title}
+                  description={card.description}
+                  columnId={columnId}
+                  index={index}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </CardContent>
       <CardFooter>
-        <ModalWindow actionType="create" tooltipContent="Add Card">
-          <CreateCardForm
-            onSubmit={handleCardCreationSubmit}
-            columnId={columnId}
-          />
-        </ModalWindow>
+        {order === 1 ? (
+          <ModalWindow actionType="create" tooltipContent="Add Card">
+            <CreateCardForm
+              onSubmit={handleCardCreationSubmit}
+              columnId={columnId}
+            />
+          </ModalWindow>
+        ) : null}
       </CardFooter>
     </Card>
   );

@@ -20,10 +20,10 @@ import { UpdateBoardForm } from "../Forms/UpdateBoardForm";
 import { useNavigate } from "react-router-dom";
 import { showErrorToast } from "@/lib/showErrorToast";
 
-type BoardInfoCardProps = IBoardResponseInterface &
+type BoardInfoCardProps = Omit<IBoardResponseInterface, "columns"> &
   React.ComponentProps<typeof Card>;
 
-const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
+const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, id }) => {
   const navigate = useNavigate();
 
   const handleBoardDelete = () => {
@@ -59,8 +59,7 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
         });
     }
   };
-
-  console.log(columns);
+  console.log("render");
   return (
     <Card className="w-1/4">
       <CardHeader>
@@ -72,8 +71,7 @@ const BoardInfoCard: FC<BoardInfoCardProps> = ({ name, columns, id }) => {
         </CardTitle>
         <CardDescription>Total tasks:</CardDescription>
       </CardHeader>
-      {/* <CardContent>{columns.length}</CardContent> */}
-      <CardContent>id:{id}</CardContent>
+      <CardContent>id: {id}</CardContent>
       <CardFooter className="flex gap-2">
         <CustomTooltip content="Edit board">
           <ModalWindow actionType="update" tooltipContent="Update board">

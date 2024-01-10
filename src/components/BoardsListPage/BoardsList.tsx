@@ -19,6 +19,8 @@ const BoardsList: FC = () => {
   if (error) return <div>Error loading data</div>;
   if (!boards) return <Skeleton className="w-[100px] h-[20px] rounded-full" />;
 
+  console.log(boards);
+
   const handleFormCreationSubmit = (data: FieldValues) => {
     createBoard(data.name)
       .then((newBoard) => {
@@ -40,13 +42,8 @@ const BoardsList: FC = () => {
       </ModalWindow>
       <div className="flex justify-between w-full">
         <div className="flex flex-wrap gap-2 w-full">
-          {boards.map((board: IBoardResponseInterface) => (
-            <BoardInfoCard
-              key={board.id}
-              id={board.id}
-              name={board.name}
-              columns={board.columns}
-            />
+          {boards.map((board: Omit<IBoardResponseInterface, "columns">) => (
+            <BoardInfoCard key={board.id} id={board.id} name={board.name} />
           ))}
         </div>
       </div>

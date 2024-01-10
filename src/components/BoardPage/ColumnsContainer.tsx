@@ -1,9 +1,14 @@
 import { fetcher } from "@/lib/fetcher";
 import { useParams } from "react-router-dom";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import Column from "./Column";
 import { IBoardColumn } from "@/interfaces/IBoardColumn.interface";
 import { Skeleton } from "../ui/skeleton";
+import { DragDropContext } from "react-beautiful-dnd";
+import { updateCard } from "@/api/Card.api";
+import { useCallback } from "react";
+import { ICard } from "@/interfaces/ICard.interface";
+import { showErrorToast } from "@/lib/showErrorToast";
 
 function ColumnsContainer() {
   const { boardId } = useParams();
@@ -17,15 +22,83 @@ function ColumnsContainer() {
     fetcher
   );
 
+  // ColumnsContainer.tsx
+
+  const onDragEnd = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (result: { destination: any; source: any; draggableId: any }) => {
+      const { destination, source, draggableId } = result;
+
+      if (!destination) {
+        return;
+      }
+
+      if (
+        source.droppableId === destination.droppableId &&
+        source.index === destination.index
+      ) {
+        return;
+      }
+
+      const startColumn = board.columns.find(
+        (column: IBoardColumn) => column.id === source.droppableId
+      );
+      const finishColumn = board.columns.find(
+        (column: IBoardColumn) => column.id === destination.droppableId
+      );
+      const card = startColumn.cards.find((c: ICard) => c.id === draggableId);
+
+      if (!card) {
+        return;
+      }
+
+      try {
+        const updatedCard = await updateCard(
+          card.id,
+          card.title,
+          card.description,
+          destination.droppableId
+        );
+
+        mutate(
+          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
+            source.droppableId
+          }`,
+          {
+            ...startColumn,
+            cards: startColumn.cards.filter((c: ICard) => c.id !== draggableId),
+          },
+          false
+        );
+
+        mutate(
+          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
+            destination.droppableId
+          }`,
+          { ...finishColumn, cards: [...finishColumn.cards, updatedCard] },
+          false
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        showErrorToast(error);
+      }
+    },
+    [board]
+  );
+
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <Skeleton className="w-full h-[500px] rounded-md" />;
 
+  const sortedColumns = [...board.columns].sort((a, b) => a.order - b.order);
+
   return (
-    <div className="flex gap-2 w-full justify-between items-stretch">
-      {board.columns.map((column: IBoardColumn) => (
-        <Column key={column.id} columnId={column.id} />
-      ))}
-    </div>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex gap-2 w-full justify-between items-stretch">
+        {sortedColumns.map((column: IBoardColumn) => (
+          <Column key={column.id} columnId={column.id} />
+        ))}
+      </div>
+    </DragDropContext>
   );
 }
 

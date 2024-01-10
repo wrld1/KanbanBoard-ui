@@ -36,12 +36,14 @@ const ModalWindow = forwardRef<HTMLButtonElement, ModalWindowProps>(
               variant="outline"
               size="icon"
               ref={ref}
-              className="bg-green-300"
+              className={
+                actionType === "create" ? "bg-green-300" : "bg-primary"
+              }
             >
               {actionType === "create" ? (
-                <PlusSquare className="h-4 w-4" />
+                <PlusSquare className="h-4 w-4 " />
               ) : (
-                <PenSquare className="h-4 w-4" />
+                <PenSquare className="h-4 w-4 " />
               )}
             </Button>
           </DialogTrigger>

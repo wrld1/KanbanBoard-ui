@@ -23,16 +23,23 @@ type CardFormProps = {
 const UpdateCardSchema = z.object({
   title: z
     .string()
-    .min(1, {
-      message: "The title length should be between 1 and 255 characters.",
-    })
-    .optional(),
+    .optional()
+    .refine(
+      (value) => value === undefined || value === "" || value.length >= 5,
+      {
+        message: "The title length should be between 5 and 255 characters.",
+      }
+    ),
   description: z
     .string()
-    .min(5, {
-      message: "The description length should be between 5 and 255 characters.",
-    })
-    .optional(),
+    .optional()
+    .refine(
+      (value) => value === undefined || value === "" || value.length >= 5,
+      {
+        message:
+          "The description length should be between 5 and 255 characters.",
+      }
+    ),
   columnId: z.string().optional(),
 });
 
@@ -47,10 +54,16 @@ export function UpdateCardForm({ id, onSubmit }: CardFormProps) {
   });
 
   const handleSubmit = (data: FieldValues) => {
-    if ("title" in data) {
-      onSubmit(id, data);
-      form.reset({ title: "", description: "", columnId: "" });
-    }
+    const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== "") {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as FieldValues);
+
+    onSubmit(id, filteredData);
+
+    form.reset({ title: "", description: "", columnId: "" });
   };
 
   return (
@@ -81,22 +94,6 @@ export function UpdateCardForm({ id, onSubmit }: CardFormProps) {
               </FormControl>
               <FormDescription>
                 This is the description of the card.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="columnId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Column ID</FormLabel>
-              <FormControl>
-                <Input placeholder="Column ID" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the ID of the column the card belongs to.
               </FormDescription>
               <FormMessage />
             </FormItem>
