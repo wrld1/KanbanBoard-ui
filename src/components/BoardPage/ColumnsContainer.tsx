@@ -5,10 +5,10 @@ import Column from "./Column";
 import { IBoardColumn } from "@/interfaces/IBoardColumn.interface";
 import { Skeleton } from "../ui/skeleton";
 import { DragDropContext } from "react-beautiful-dnd";
-import { updateCard } from "@/api/Card.api";
 import { useCallback } from "react";
-import { ICard } from "@/interfaces/ICard.interface";
 import { showErrorToast } from "@/lib/showErrorToast";
+import { ICard } from "@/interfaces/ICard.interface";
+import { updateCardColumn } from "@/api/Card.api";
 
 function ColumnsContainer() {
   const { boardId } = useParams();
@@ -53,10 +53,8 @@ function ColumnsContainer() {
       }
 
       try {
-        const updatedCard = await updateCard(
+        const updatedCard = await updateCardColumn(
           card.id,
-          card.title,
-          card.description,
           destination.droppableId
         );
 
@@ -78,6 +76,17 @@ function ColumnsContainer() {
           { ...finishColumn, cards: [...finishColumn.cards, updatedCard] },
           false
         );
+
+        mutate(
+          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
+            source.droppableId
+          }`
+        );
+        mutate(
+          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
+            destination.droppableId
+          }`
+        );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         showErrorToast(error);
@@ -93,6 +102,7 @@ function ColumnsContainer() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <h2 className="font-bold uppercase">{board.name}</h2>
       <div className="flex gap-2 w-full justify-between items-stretch">
         {sortedColumns.map((column: IBoardColumn) => (
           <Column key={column.id} columnId={column.id} />
