@@ -37,6 +37,20 @@ export async function updateCard(
   return updatedCard;
 }
 
+export async function updateCardColumn(id: string, newColumnId?: string) {
+  const updatedCard = await fetcher(
+    `${import.meta.env.VITE_BASE_API_LINK}/cards/${id}/update-column`,
+    "PATCH",
+    { newColumnId }
+  );
+
+  if (!updatedCard) {
+    throw new Error("Failed to update card");
+  }
+
+  return updatedCard;
+}
+
 export async function deleteCard(id: string) {
   return await fetcher(
     `${import.meta.env.VITE_BASE_API_LINK}/cards/${id}`,

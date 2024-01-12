@@ -5,10 +5,7 @@ import Column from "./Column";
 import { IBoardColumn } from "@/interfaces/IBoardColumn.interface";
 import { Skeleton } from "../ui/skeleton";
 import { DragDropContext } from "react-beautiful-dnd";
-import { updateCard } from "@/api/Card.api";
-import { useCallback } from "react";
-import { ICard } from "@/interfaces/ICard.interface";
-import { showErrorToast } from "@/lib/showErrorToast";
+import { updateCardColumn } from "@/api/Card.api";
 
 function ColumnsContainer() {
   const { boardId } = useParams();
@@ -22,69 +19,47 @@ function ColumnsContainer() {
     fetcher
   );
 
-  // ColumnsContainer.tsx
-
-  const onDragEnd = useCallback(
+  const onDragEnd = async (result: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (result: { destination: any; source: any; draggableId: any }) => {
-      const { destination, source, draggableId } = result;
+    destination: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    source: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draggableId: any;
+  }) => {
+    const { destination, source, draggableId } = result;
 
-      if (!destination) {
-        return;
-      }
+    if (!destination) return;
 
-      if (
-        source.droppableId === destination.droppableId &&
-        source.index === destination.index
-      ) {
-        return;
-      }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
 
-      const startColumn = board.columns.find(
-        (column: IBoardColumn) => column.id === source.droppableId
+    const sourceColId = source.droppableId;
+    const destinationColId = destination.droppableId;
+
+    if (sourceColId === destinationColId) {
+      await updateCardColumn(draggableId, destinationColId);
+      mutate(
+        `${
+          import.meta.env.VITE_BASE_API_LINK
+        }/board-columns/${destinationColId}`
       );
-      const finishColumn = board.columns.find(
-        (column: IBoardColumn) => column.id === destination.droppableId
-      );
-      const card = startColumn.cards.find((c: ICard) => c.id === draggableId);
+      return;
+    }
 
-      if (!card) {
-        return;
-      }
+    await updateCardColumn(draggableId, destinationColId);
 
-      try {
-        const updatedCard = await updateCard(
-          card.id,
-          card.title,
-          card.description,
-          destination.droppableId
-        );
-
-        mutate(
-          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
-            source.droppableId
-          }`,
-          {
-            ...startColumn,
-            cards: startColumn.cards.filter((c: ICard) => c.id !== draggableId),
-          },
-          false
-        );
-
-        mutate(
-          `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${
-            destination.droppableId
-          }`,
-          { ...finishColumn, cards: [...finishColumn.cards, updatedCard] },
-          false
-        );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        showErrorToast(error);
-      }
-    },
-    [board]
-  );
+    mutate(
+      `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${sourceColId}`
+    );
+    mutate(
+      `${import.meta.env.VITE_BASE_API_LINK}/board-columns/${destinationColId}`
+    );
+  };
 
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <Skeleton className="w-full h-[500px] rounded-md" />;
