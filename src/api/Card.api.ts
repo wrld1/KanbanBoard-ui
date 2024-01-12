@@ -45,7 +45,7 @@ export async function updateCardColumn(id: string, newColumnId?: string) {
   );
 
   if (!updatedCard) {
-    throw new Error("Failed to update card");
+    throw new Error("Failed to update card column");
   }
 
   return updatedCard;

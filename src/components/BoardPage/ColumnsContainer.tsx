@@ -68,6 +68,7 @@ function ColumnsContainer() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <h2 className="font-bold uppercase">{board.name}</h2>
       <div className="flex gap-2 w-full justify-between items-stretch">
         {sortedColumns.map((column: IBoardColumn) => (
           <Column key={column.id} columnId={column.id} />
